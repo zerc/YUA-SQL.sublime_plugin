@@ -1,0 +1,5 @@
+*.pyc
+venv
+.webassets-cache
+*.sublime-project
+*.sublime-workspace
