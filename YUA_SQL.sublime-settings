@@ -1,0 +1,8 @@
+{
+	// settings for psql
+	"psql": {
+		"user": 		"aiw_user",
+		"db_name": 	"alli",
+		"host": 		"localhost"
+	}
+}

@@ -1,30 +1,25 @@
-import sublime, sublime_plugin
-import os
-import re
+import sublime
+import sublime_plugin
 
-sql = """echo "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';" | psql -U aiw_user -d alli"""
-f = os.popen(sql)
-raw = f.read()
-a = raw.strip().split('\n ')[2:-1]
+from psql import PsqlCommander
+from patterns import Patterns
 
+format = lambda l: [(x, x) for x in l]
 
-def get_columns(table):
-    cmd = """ echo "SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = '%s';" | psql -U aiw_user -d alli """ % table
-    f = os.popen(cmd)
-    raw = f.read()
-    return raw.strip().split('\n ')[2:-1]
+psql = PsqlCommander(settings=sublime.load_settings('YUA_SQL.sublime-settings'))
+
+patterns = Patterns()
+patterns.register('tables', psql.get_tables)
+patterns.register('columns', psql.get_columns)
 
 
 class YuaSqlAutocomplete(sublime_plugin.EventListener):
     def on_query_completions(self, view, prefix, locations):
-        row, col = view.rowcol(view.sel()[0].begin())
-        line_substr = view.substr(view.line(view.sel()[0].begin()))
+        cur = view.sel()[0].begin()
 
-        if re.findall("INSERT INTO \"\w*$", line_substr[:col]):
-            return [(x, x) for x in a]
+        row, col = view.rowcol(cur)
+        line_substr = view.substr(view.line(cur))
 
-        table_name = re.findall("INSERT INTO \"(\w*)\" \([\w\s,\"]*$", line_substr[:col])
-
-        if table_name and table_name[0]:
-            result = get_columns(table_name[0])
-            return [(x, x) for x in result]
+        result = patterns.match(line_substr[:col], line_substr[col:])
+        # result = patterns.match(line_substr)
+        return format(result) if result else None

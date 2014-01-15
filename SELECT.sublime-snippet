@@ -5,10 +5,3 @@ SELECT ${2:*} FROM "${1:snippet}" WHERE ${0}
     <tabTrigger>SELECT</tabTrigger>
      <scope>source.sql</scope>
 </snippet>
-<snippet>
-    <content><![CDATA[
-INSERT INTO "${1}" (${2}) VALUES (${0})
-]]></content>
-    <tabTrigger>INS</tabTrigger>
-    <scope>source.sql</scope>
-</snippet>
