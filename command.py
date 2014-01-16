@@ -1,13 +1,22 @@
 import sublime
 import sublime_plugin
 
-from psql import PsqlCommander
-from patterns import Patterns
+try:
+    # Sublime 3
+    from psql import PsqlCommander
+    from patterns import Patterns
+    st_version = 3
+except (ImportError):
+    # Sublime 2
+    from .psql import PsqlCommander
+    from .patterns import Patterns
+    st_version = 2
+
 
 format = lambda l: [(x, x) for x in l]
 
-psql = PsqlCommander(settings=sublime.load_settings('YUA_SQL.sublime-settings'))
 
+psql = PsqlCommander()
 patterns = Patterns()
 patterns.register('tables', psql.get_tables)
 patterns.register('columns', psql.get_columns)

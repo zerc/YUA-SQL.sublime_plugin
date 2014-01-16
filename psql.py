@@ -2,16 +2,21 @@
 import os
 import subprocess
 
+import sublime
+
 
 class PsqlCommander(object):
     """
     Wrapper around `psql` console programm
     """
-    def __init__(self, settings, *args, **kwargs):
-        self.settings = settings
+    def __init__(self, *args, **kwargs):
+        self._load_settings()
         self.cmd_tmpl = \
             'psql -U {user} -d {db_name} -h {host} -c "{{cmd}}"'.format(
             **self.settings.get('psql'))
+
+    def _load_settings(self):
+        self.settings = sublime.load_settings('YUA_SQL.sublime-settings')
 
     def _call(self, cmd):
         params = dict(stderr=subprocess.STDOUT, stdin=subprocess.PIPE,
