@@ -9,7 +9,8 @@ class PsqlCommander(object):
     """
     Wrapper around `psql` console programm
     """
-    def __init__(self, *args, **kwargs):
+    def __init__(self, st_version, *args, **kwargs):
+        self.st_version = st_version
         self._load_settings()
         self.cmd_tmpl = \
             'psql -U {user} -d {db_name} -h {host} -c "{{cmd}}"'.format(
@@ -23,7 +24,12 @@ class PsqlCommander(object):
                       stdout=subprocess.PIPE, shell=True)
         popen = subprocess.Popen(cmd, **params)
         data = popen.communicate()[0]
+        
+        if self.st_version == 3:
+            return data.strip().split(b'\n ')[2:-1]
+
         return data.strip().split('\n ')[2:-1]
+
 
     def get_tables(self, *args, **kwargs):
         sql = """

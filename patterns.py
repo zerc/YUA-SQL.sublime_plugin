@@ -45,5 +45,5 @@ class Patterns(object):
 
                 result = p.findall(s)
 
-                if result and result[0]:
+                if result and result[0] and _re['func']:
                     return _re['func'](result[0])
