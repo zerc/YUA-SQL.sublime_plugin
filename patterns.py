@@ -2,48 +2,26 @@
 import os
 import re
 
+tables_re = re.compile("(INTO|FROM|UPDATE) \"\w+$")
+columns_re = re.compile("(INTO|FROM|UPDATE) \"(\w+)\" ")
 
-class Patterns(object):
+def is_table_request(s, col):
     """
-    Object for call specified functions for patterns
+    Test what `s` is are string for fetching tables
     """
-    def __init__(self, *args, **kwargs):
-        self._re = dict(
-            tables=dict(
-                func=None,
-                patterns=[
-                    ('left', re.compile("(INTO|FROM|UPDATE) \"\w+$"))
-                ]
-            ),
+    return not not tables_re.findall(s[:col])
 
-            columns=dict(
-                func=None,
-                patterns=[
-                    ('both', re.compile('INTO "(\w+)" \(')),
-                    ('both', re.compile('FROM "(\w+)"')),
-                    ('both', re.compile('UPDATE "(\w+)"')),
-                ]
-            )
-        )
 
-    def register(self, pattern_name, func):
-        if pattern_name not in self._re.keys():
-            return
-        self._re[pattern_name]['func'] = func
+def is_columns_request(s, col):
+    """
+    Test what `s` is are string for fetching columns
+    """
+    return not not columns_re.findall(s)
 
-    def match(self, l_string, r_string):
-        for _re in self._re.values():
-            for row in _re['patterns']:
-                use, p = row
 
-                if use == 'left':
-                    s = l_string
-                elif use == 'right':
-                    s = r_string
-                else:
-                    s = l_string + r_string
-
-                result = p.findall(s)
-
-                if result and result[0] and _re['func']:
-                    return _re['func'](result[0])
+def get_table_name(s, col):
+    """
+    Extract table_name from s
+    """
+    result = columns_re.findall(s)
+    return result[0][1]
